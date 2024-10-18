@@ -1,2 +1,2 @@
-# fmri_pipeline_playground
+# fMRI pipelines playground
 A sandbox project to test scripting of fMRI pipelines
