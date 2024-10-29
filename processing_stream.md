@@ -82,7 +82,16 @@ flowchart TB
         model"}
 
         noise@{ shape: process, label: "**Noise modelling**
+        Incorporate noise (e.g. LF drift) into the GLM
         "}
+
+        HP_filter@{ shape: decision, label: "High-pass
+        filtering"}
+
+        prewhitening@{ shape: decision, label: "Prewhitening
+        "}
+
+        precoloring@{ shape: decision, label: "Precoloring"}
 
         matrix@{ shape: process, label: "**Design matrix building**
         Choice of GLM regressors
@@ -174,7 +183,7 @@ flowchart TB
     mapsmoothing --> distorsion
     distorsion --> timing
     timing --> timing_interpol --> motion
-    %% distorsion --> motion
+    distorsion <-- can be inverted --> motion
     motion --> target --> cost_func --> motion_interpol --> coregistration
     anatpreproc --> coregistration
     %% motion --> normalization
@@ -187,7 +196,9 @@ flowchart TB
     hrf_model --> hrf
     hrf_note --o hrf
     hrf --> noise
-    noise --> matrix
+    noise --> HP_filter
+    HP_filter --> prewhitening --> matrix
+    HP_filter --> precoloring --> matrix
     matrix --> param_modulation --> resp_time --> orthogonalization --> nuisance --> contrasts
     contrasts --> testing
     testing --> 1st_result
