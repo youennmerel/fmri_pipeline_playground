@@ -71,7 +71,7 @@ flowchart TB
 
     end
 
-    subgraph 1st Level Analysis
+    subgraph Single Subject Analysis 
         direction TB
 
         hrf_model@{ shape: process, label: "**Signal modelling**
@@ -130,11 +130,20 @@ flowchart TB
     fa:fa-gear With derivatives
     fa:fa-gear Finite Impulse Response Model"}
 
-    subgraph Group Level Analysis
+    subgraph Group Analysis
         direction TB
 
         group_matrix@{ shape: process, label: "**Design matrix building**
+            Choice of mixed effect GLM regressors
         "}
+
+        gls@{ shape: decision, label: "GLS model
+        estimation"}
+
+        ols@{ shape: decision, label: "OLS model
+        estimation"}
+
+        orthogonalization@{ shape: decision, label: "Orthogonalization"}
 
         group_contrasts@{ shape: process, label: "**Contrasts definition**
         "}
@@ -206,7 +215,8 @@ flowchart TB
     %% GROUP LEVEL
 
     1st_result --> group_matrix
-    group_matrix --> group_contrasts
+    group_matrix --> gls --> group_contrasts
+    group_matrix --> ols --> group_contrasts
     group_contrasts --> group_testing
     group_testing --> group_result
 
