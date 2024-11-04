@@ -142,7 +142,8 @@ flowchart TB
 
     hrf_note@{ shape: comment, label : "• Canonical HRF
     • With derivatives
-    • Finite Impulse Response Model"}
+    • Finite Impulse Response Model
+    "}
 
 
     %% GROUP LEVEL
@@ -183,11 +184,24 @@ flowchart TB
         Application of thresholds on statistical maps
         "}
 
+        voxel_wise@{ shape: decision, label: "Voxel-wise"}
+
+        cluster_wise@{ shape: decision, label: "Cluster-wise"}
+
+        inf_threshold@{ shape: decision, label: "Threshold"}
+
         inference_result@{ shape: docs, label: "**Inference results**
         Thresholded statistical maps
         "}
 
     end
+
+    %% INFERENCE NOTES
+
+    inf_threshold_note@{ shape: comment, label : "• 6-connectivity (faces)
+    • 18-connectivity (faces+edges)
+    • 26-connectivity (faces+edges+corners)
+    "}
 
 
     distorsion_params@{ shape: rounded, label:  "fa:fa-gear field map and/or estimation ?
@@ -244,7 +258,10 @@ flowchart TB
 
     group_result --> threshold
     threshold --> inference
-    inference --> inference_result
+    inference --> voxel_wise --> inference_result
+    inference --> cluster_wise
+    cluster_wise --> inf_threshold --> inference_result
+    inf_threshold_note --o inf_threshold
 
     distorsion_params --o distorsion
     motion_params --o motion
