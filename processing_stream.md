@@ -193,6 +193,9 @@ flowchart TB
 
         inf_threshold@{ shape: decision, label: "Threshold"}
 
+        fwer@{ shape: decision, label: "FWER
+        correction"}
+
         inference_result@{ shape: docs, label: "**Inference results**
         Thresholded statistical maps
         "}
@@ -205,6 +208,12 @@ flowchart TB
     • 18-connectivity (faces+edges)
     • 26-connectivity (faces+edges+corners)
     "}
+
+    fwer_note@{ shape: comment, label : "• Bonferroni correction
+        • Random Field Theory
+        • Monte Carlo simulation
+        • Non parametric methods
+        "}
 
 
     distorsion_params@{ shape: rounded, label:  "fa:fa-gear field map and/or estimation ?
@@ -261,10 +270,12 @@ flowchart TB
 
     group_result --> threshold
     threshold --> inference --> roi
-    roi --> voxel_wise --> inference_result
+    roi --> voxel_wise --> fwer
     roi --> cluster_wise
-    cluster_wise --> inf_threshold --> inference_result
+    cluster_wise --> inf_threshold --> fwer
     inf_threshold_note --o inf_threshold
+    fwer_note --o fwer
+    fwer --> inference_result
 
     distorsion_params --o distorsion
     motion_params --o motion
