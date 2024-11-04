@@ -121,7 +121,6 @@ flowchart TB
         nuisance@{ shape: decision, label: "Nuisance
         regressors"}
 
-
         contrasts@{ shape: process, label: "**Contrasts definition**
         Definition of hypothesis (H0, H1) and corresponding contrasts
         "}
@@ -145,6 +144,22 @@ flowchart TB
     • Finite Impulse Response Model
     "}
 
+    param_modulation_note@{ shape: comment, label : "Model the variation in neural response strength
+    linked to stimulus modulation
+    "}
+
+    resp_time_note@{ shape: comment, label : "Model differences in
+    subject's response time
+    "}
+
+    orthogonalization_note@{ shape: comment, label: "Remove correlation
+    between regressors"}
+
+    nuisance_note@{ shape: comment, label: "• physiological noise (breathing, heartbeat)
+    • motion estimates (from motion correction)
+    • CSF signal
+    • WM signal"}
+    
 
     %% GROUP LEVEL
     subgraph Group Analysis
@@ -254,6 +269,10 @@ flowchart TB
     HP_filter --> prewhitening --> matrix
     HP_filter --> precoloring --> matrix
     matrix --> param_modulation --> resp_time --> orthogonalization --> nuisance --> contrasts
+    param_modulation_note --o param_modulation
+    resp_time_note --o resp_time
+    orthogonalization_note --o orthogonalization
+    nuisance_note --o nuisance
     contrasts --> testing
     testing --> 1st_result
 
