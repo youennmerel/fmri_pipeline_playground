@@ -79,7 +79,7 @@ flowchart TB
     • Brain extraction
     • Tissue segmentation"}
 
-    fwhm_note@{ shape: comment, label : "= Full Width at Half Maximum
+    fwhm_note@{ shape: comment, label : "(Full Width at Half Maximum)
     The larger, the greater the smoothing
     "}
 
@@ -189,6 +189,15 @@ flowchart TB
     
     end
 
+    %% GROUP LEVEL NOTE
+    gls_note@{ shape: comment, label: "(Generalized Least Squares)
+    Down-weight subject with high within-subject variance
+    "}
+
+    ols_note@{ shape: comment, label:  "(Ordinary Least Squares)
+    Within-subject variance is assumed identical for all subjects
+    "}
+
     %% INFERENCE
     subgraph Statistical inference
 
@@ -281,6 +290,8 @@ flowchart TB
     1st_result --> group_matrix
     group_matrix --> gls --> group_contrasts
     group_matrix --> ols --> group_contrasts
+    ols_note --o ols
+    gls_note --o gls
     group_contrasts --> group_testing
     group_testing --> group_result
 
