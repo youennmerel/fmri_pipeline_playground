@@ -184,6 +184,9 @@ flowchart TB
         Application of thresholds on statistical maps
         "}
 
+        roi@{ shape: decision, label: "ROI
+        masks"}
+
         voxel_wise@{ shape: decision, label: "Voxel-wise"}
 
         cluster_wise@{ shape: decision, label: "Cluster-wise"}
@@ -257,9 +260,9 @@ flowchart TB
     %% INFERENCE
 
     group_result --> threshold
-    threshold --> inference
-    inference --> voxel_wise --> inference_result
-    inference --> cluster_wise
+    threshold --> inference --> roi
+    roi --> voxel_wise --> inference_result
+    roi --> cluster_wise
     cluster_wise --> inf_threshold --> inference_result
     inf_threshold_note --o inf_threshold
 
