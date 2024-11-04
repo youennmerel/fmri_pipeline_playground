@@ -5,6 +5,7 @@ flowchart TB
 
     %% Step declaration
 
+    %% INPUTS
     func@{ shape: docs, label: "**Functional images**
         "}
 
@@ -17,6 +18,7 @@ flowchart TB
     field@{ shape: doc, label: "**Field map**
         "}
 
+    %% PREPROCESSING
     subgraph Preprocessing
         direction TB
 
@@ -71,6 +73,17 @@ flowchart TB
 
     end
 
+    %% PREPROCESSING NOTES
+
+    anatpreproc_note@{ shape: comment, label : "• Bias field correction
+    • Brain extraction
+    • Tissue segmentation"}
+
+    fwhm_note@{ shape: comment, label : "= Full Width at Half Maximum
+    The larger, the greater the smoothing
+    "}
+
+    %% 1ST LEVEL
     subgraph Single Subject Analysis 
         direction TB
 
@@ -123,13 +136,16 @@ flowchart TB
         3D variance contrast maps
         "}
 
-
     end
 
-    hrf_note@{ shape: comment, label : "fa:fa-gear Canonical HRF
-    fa:fa-gear With derivatives
-    fa:fa-gear Finite Impulse Response Model"}
+    %% 1ST LEVEL NOTES
 
+    hrf_note@{ shape: comment, label : "• Canonical HRF
+    • With derivatives
+    • Finite Impulse Response Model"}
+
+
+    %% GROUP LEVEL
     subgraph Group Analysis
         direction TB
 
@@ -157,6 +173,7 @@ flowchart TB
     
     end
 
+    %% INFERENCE
     subgraph Statistical inference
 
         threshold@{ shape: process, label: "**Thresholds definition**
@@ -195,10 +212,12 @@ flowchart TB
     distorsion <-- can be inverted --> motion
     motion --> target --> cost_func --> motion_interpol --> coregistration
     anatpreproc --> coregistration
+    anatpreproc_note --o anatpreproc
     %% motion --> normalization
     coregistration --> normalization
     normalization --> normalization_method --> smoothing
     smoothing --> fwhm
+    fwhm --o fwhm_note
 
     %% 1ST LEVEL
     fwhm --> hrf_model
