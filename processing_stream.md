@@ -178,6 +178,17 @@ flowchart TB
     • Finite Impulse Response Model
     "}
 
+    HP_filter_note@{ shape: comment, label : "Filter out LF noise (drift)
+    • Discrete Cosine Function
+    • LOWESS (FSL)
+    "}
+
+    prewhitening_note@{ shape: comment, label : "Remove temporal autocorrelation between adjacent time points data
+    "}
+
+    precoloring_note@{ shape: comment, label : "Temporal smoothing to swamp the correlation
+    "}
+
     param_modulation_note@{ shape: comment, label : "Model the variation in neural response strength
     linked to stimulus modulation
     "}
@@ -262,8 +273,6 @@ flowchart TB
 
     %% INFERENCE NOTES
 
-    
-
     voxel_wise_note@{ shape: comment, label: "Each voxel is tested individually"}
 
     cluster_wise_note@{ shape: comment, label: "Connected clusters of activated voxels are tested"}
@@ -323,6 +332,9 @@ flowchart TB
     noise --> HP_filter
     HP_filter --> prewhitening --> matrix
     HP_filter --> precoloring --> matrix
+    HP_filter_note --o HP_filter
+    prewhitening_note --o prewhitening
+    precoloring_note --o precoloring
     matrix --> param_modulation --> resp_time --> orthogonalization --> nuisance --> contrasts
     param_modulation_note --o param_modulation
     resp_time_note --o resp_time
