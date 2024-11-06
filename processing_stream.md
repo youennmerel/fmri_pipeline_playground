@@ -176,6 +176,7 @@ flowchart TB
     hrf_note@{ shape: comment, label : "• Canonical HRF
     • With derivatives
     • Finite Impulse Response Model
+    • Constrained Basis Sets
     "}
 
     HP_filter_note@{ shape: comment, label : "Filter out LF noise (drift)
