@@ -42,8 +42,10 @@ flowchart TB
 
         target@{ shape: decision, label: "Target 
         image"}
+
         cost_func@{ shape: decision, label: "Cost 
         function"}
+
         motion_interpol@{ shape: decision, label: "Interpolation 
         method"}
 
@@ -75,9 +77,33 @@ flowchart TB
 
     %% PREPROCESSING NOTES
 
+    target_note@{ shape: comment, label: "•  Middle image 
+        • Mean image
+        • First image
+    "}
+
+    cost_func_note@{ shape: comment, label: "• Least square (SPM) 
+        • Normalized correlation ratio (FSL)
+        • ...
+    "}
+
+    motion_interpol_note@{ shape: comment, label: "• Linear
+        • High-order (spline, sinc, FT...)
+    "}
+
     anatpreproc_note@{ shape: comment, label : "• Bias field correction
     • Brain extraction
     • Tissue segmentation"}
+
+    mni_version_note@{ shape: comment, label : "• MNI305
+    • MNI152 (linear, NLIN 6th gen, NLIN 2009[a,b]...)
+    • ..."}
+
+    normalization_method_note@{ shape: comment, label : "• Landmark-based
+    • Volume-based registration (linear, non-linear)
+    • Computational anatomy
+    • Surface-based"}
+
 
     fwhm_note@{ shape: comment, label : "(Full Width at Half Maximum)
     The larger, the greater the smoothing
@@ -228,12 +254,21 @@ flowchart TB
 
     %% INFERENCE NOTES
 
-    inf_threshold_note@{ shape: comment, label : "• 6-connectivity (faces)
+    
+
+    voxel_wise_note@{ shape: comment, label: "Each voxel is tested individually"}
+
+    cluster_wise_note@{ shape: comment, label: "Connected clusters of activated voxels are tested"}
+
+    inf_threshold_note@{ shape: comment, label : "Define how voxels are connected into a cluster
+    • 6-connectivity (faces)
     • 18-connectivity (faces+edges)
     • 26-connectivity (faces+edges+corners)
     "}
 
-    fwer_note@{ shape: comment, label : "• Bonferroni correction
+    fwer_note@{ shape: comment, label : "(Family Wise Error Rate)
+        Correct P-value for multiple (voxel) testing 
+        • Bonferroni correction
         • Random Field Theory
         • Monte Carlo simulation
         • Non parametric methods
@@ -252,6 +287,7 @@ flowchart TB
     anat --> anatpreproc
     %% anat --> coregistration
     mni --> mni_version --> normalization
+    mni_version_note --o mni_version
     field --> mapsmoothing
 
     %% PREPROCESSING
@@ -259,13 +295,17 @@ flowchart TB
     mapsmoothing --> distorsion
     distorsion --> timing
     timing --> timing_interpol --> motion
-    distorsion <-- can be inverted --> motion
+    distorsion <-- "can be inverted" --> motion
     motion --> target --> cost_func --> motion_interpol --> coregistration
+    target_note --o target
+    cost_func_note --o cost_func
+    motion_interpol_note --o motion_interpol
     anatpreproc --> coregistration
     anatpreproc_note --o anatpreproc
     %% motion --> normalization
     coregistration --> normalization
     normalization --> normalization_method --> smoothing
+    normalization_method_note --o normalization_method
     smoothing --> fwhm
     fwhm --o fwhm_note
 
@@ -301,7 +341,9 @@ flowchart TB
     group_result --> threshold
     threshold --> inference --> roi
     roi --> voxel_wise --> fwer
+    voxel_wise_note --o voxel_wise
     roi --> cluster_wise
+    cluster_wise_note --o cluster_wise
     cluster_wise --> inf_threshold --> fwer
     inf_threshold_note --o inf_threshold
     fwer_note --o fwer
