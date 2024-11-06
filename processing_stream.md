@@ -53,9 +53,6 @@ flowchart TB
         Align anatomical and functional images of each subjects
         "}
 
-        anatpreproc@{ shape: subprocess, label: "**Preprocessing of anatomical image**
-        "}
-
         normalization@{ shape: process, label: "**Spatial normalization**
         Align subjects images to a common template
         "}
@@ -91,10 +88,6 @@ flowchart TB
         • High-order (spline, sinc, FT...)
     "}
 
-    anatpreproc_note@{ shape: comment, label : "• Bias field correction
-    • Brain extraction
-    • Tissue segmentation"}
-
     mni_version_note@{ shape: comment, label : "• MNI305
     • MNI152 (linear, NLIN 6th gen, NLIN 2009[a,b]...)
     • ..."}
@@ -108,6 +101,21 @@ flowchart TB
     fwhm_note@{ shape: comment, label : "(Full Width at Half Maximum)
     The larger, the greater the smoothing
     "}
+
+    %% ANAT PREPROCESSING
+    subgraph Structural image preprocessing
+        anat_bias@{ shape: process, label: "**Bias field correction**
+        Correct differences in intensities across the image
+        "}
+
+        anat_extract@{ shape: process, label: "**Brain extraction**
+        Extract brain from other tissues (skull, spinal chord...)
+        "}
+
+        anat_segment@{ shape: process, label: "**Tissue segmentation**
+        Categorize the different tissues composing the brain (WM, GM, CSF)
+        "}
+    end
 
     %% 1ST LEVEL
     subgraph Single Subject Analysis 
@@ -284,8 +292,7 @@ flowchart TB
 
     %% INPUTS
     func --> distorsion
-    anat --> anatpreproc
-    %% anat --> coregistration
+    anat --> anat_bias
     mni --> mni_version --> normalization
     mni_version_note --o mni_version
     field --> mapsmoothing
@@ -300,8 +307,7 @@ flowchart TB
     target_note --o target
     cost_func_note --o cost_func
     motion_interpol_note --o motion_interpol
-    anatpreproc --> coregistration
-    anatpreproc_note --o anatpreproc
+    anat_bias --> anat_extract --> anat_segment --> coregistration
     %% motion --> normalization
     coregistration --> normalization
     normalization --> normalization_method --> smoothing
