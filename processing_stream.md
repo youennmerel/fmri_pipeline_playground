@@ -33,6 +33,9 @@ flowchart TB
         Correct differences in slices acquisition timing
         "}
 
+        timing_target@{ shape: decision, label: "Target
+        slice"}
+
         timing_interpol@{ shape: decision, label: "Interpolation
         method"}
         
@@ -75,6 +78,13 @@ flowchart TB
     %% PREPROCESSING NOTES
 
     mapsmoothing_note@{ shape: comment, label: "Apply LP filtering to reduce noise in the field map"}
+
+    timing_target_note@{ shape: comment, label: "Reference slice on which to align full image timing
+    "}
+
+    timing_interpol_note@{ shape: comment, label: "• Linear
+        • High-order (spline, sinc, FT...)
+    "}
 
     target_note@{ shape: comment, label: "•  Middle image 
         • Mean image
@@ -316,7 +326,9 @@ flowchart TB
     mapsmoothing_note --o mapsmoothing
     mapsmoothing --> distorsion
     distorsion --> timing
-    timing --> timing_interpol --> motion
+    timing --> timing_target --> timing_interpol --> motion
+    timing_target_note --o timing_target
+    timing_interpol_note --o timing_interpol
     distorsion <-- "can be inverted" --> motion
     motion --> target --> cost_func --> motion_interpol --> coregistration
     target_note --o target
