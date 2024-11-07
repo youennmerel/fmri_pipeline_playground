@@ -277,8 +277,6 @@ flowchart TB
     roi_note@{ shape: comment, label: "Define Regions Of Interests on which to focus inference.
     Reduce the volume searched for activation (small volume correction)"}
 
-    }
-
     voxel_wise_note@{ shape: comment, label: "Each voxel is tested individually"}
 
     cluster_wise_note@{ shape: comment, label: "Connected clusters of activated voxels are tested"}
