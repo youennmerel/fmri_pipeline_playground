@@ -266,6 +266,9 @@ flowchart TB
         fwer@{ shape: decision, label: "FWER
         correction"}
 
+        fdr@{ shape: decision, label: "FDR
+        correction"}
+
         inference_result@{ shape: docs, label: "**Inference results**
         Thresholded statistical maps
         "}
@@ -288,6 +291,7 @@ flowchart TB
     "}
 
     fwer_note@{ shape: comment, label : "(Family Wise Error Rate)
+        Estimate the chance of at least one false positive
         Correct P-value for multiple (voxel) testing 
         • Bonferroni correction
         • Random Field Theory
@@ -295,6 +299,9 @@ flowchart TB
         • Non parametric methods (bootstrap, permutation test [FSL, SPM])
         "}
 
+    fdr_note@{ shape: comment, label : "(False Discovery Rate)
+        Estimate rate of false positive
+        "}
 
     distorsion_params@{ shape: rounded, label:  "fa:fa-gear field map and/or estimation ?
     " }
@@ -362,15 +369,21 @@ flowchart TB
 
     group_result --> threshold
     threshold --> inference --> roi
-    roi --> voxel_wise --> fwer
+    roi --> voxel_wise
     voxel_wise_note --o voxel_wise
     roi --> cluster_wise
     roi_note --o roi
     cluster_wise_note --o cluster_wise
-    cluster_wise --> inf_threshold --> fwer
+    cluster_wise --> inf_threshold
+    inf_threshold --> fwer
+    voxel_wise --> fwer
+    inf_threshold --> fdr
+    voxel_wise --> fdr
+    fdr_note --o fdr
     inf_threshold_note --o inf_threshold
     fwer_note --o fwer
     fwer --> inference_result
+    fdr --> inference_result
 
     distorsion_params --o distorsion
     motion_params --o motion
