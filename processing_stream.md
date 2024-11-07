@@ -274,6 +274,11 @@ flowchart TB
 
     %% INFERENCE NOTES
 
+    roi_note@{ shape: comment, label: "Define Regions Of Interests on which to focus inference.
+    Reduce the volume searched for activation (small volume correction)"}
+
+    }
+
     voxel_wise_note@{ shape: comment, label: "Each voxel is tested individually"}
 
     cluster_wise_note@{ shape: comment, label: "Connected clusters of activated voxels are tested"}
@@ -288,8 +293,8 @@ flowchart TB
         Correct P-value for multiple (voxel) testing 
         • Bonferroni correction
         • Random Field Theory
-        • Monte Carlo simulation
-        • Non parametric methods
+        • Monte Carlo simulation (AFNI)
+        • Non parametric methods (bootstrap, permutation test [FSL, SPM])
         "}
 
 
@@ -362,6 +367,7 @@ flowchart TB
     roi --> voxel_wise --> fwer
     voxel_wise_note --o voxel_wise
     roi --> cluster_wise
+    roi_note --o roi
     cluster_wise_note --o cluster_wise
     cluster_wise --> inf_threshold --> fwer
     inf_threshold_note --o inf_threshold
