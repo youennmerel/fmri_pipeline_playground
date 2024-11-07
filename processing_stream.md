@@ -74,6 +74,8 @@ flowchart TB
 
     %% PREPROCESSING NOTES
 
+    mapsmoothing_note@{ shape: comment, label: "Apply LP filtering to reduce noise in the field map"}
+
     target_note@{ shape: comment, label: "•  Middle image 
         • Mean image
         • First image
@@ -303,13 +305,6 @@ flowchart TB
         Estimate rate of false positive
         "}
 
-    distorsion_params@{ shape: rounded, label:  "fa:fa-gear field map and/or estimation ?
-    " }
-    
-    motion_params@{ shape: rounded, label:  "fa:fa-gear use of ICA ?
-    " }
-
-
     %% INPUTS
     func --> distorsion
     anat --> anat_bias
@@ -318,7 +313,7 @@ flowchart TB
     field --> mapsmoothing
 
     %% PREPROCESSING
-    %% field --> distorsion
+    mapsmoothing_note --o mapsmoothing
     mapsmoothing --> distorsion
     distorsion --> timing
     timing --> timing_interpol --> motion
@@ -385,6 +380,4 @@ flowchart TB
     fwer --> inference_result
     fdr --> inference_result
 
-    distorsion_params --o distorsion
-    motion_params --o motion
 ```
