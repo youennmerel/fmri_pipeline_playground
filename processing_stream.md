@@ -13,9 +13,12 @@ flowchart TB
         "}
 
     mni@{ shape: doc, label: "**MNI template**
+    Mean images developed by the Montreal Neurological Institute
+    on which subjects images can be aligned
         "}
 
     field@{ shape: doc, label: "**Field map**
+    Image that characterize the MRI B0 field
         "}
 
     %% PREPROCESSING
