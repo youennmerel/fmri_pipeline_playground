@@ -1,5 +1,7 @@
 data/
 results/
 orig_data/
+work/
 *.ps
 .idea
+*.pklz
