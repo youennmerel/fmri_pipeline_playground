@@ -192,43 +192,82 @@ def get_subject_analysis():
 
 
 def compare_outputs():
-    orig_results_path = '/home/ymerel/fmri_pipeline_playground/spm/auditory/matlab/data/sub-01/'
+    orig_func_path = '/home/ymerel/fmri_pipeline_playground/spm/auditory/matlab/data/sub-01/func/'
+    orig_anat_path = '/home/ymerel/fmri_pipeline_playground/spm/auditory/matlab/data/sub-01/anat/'
+    orig_results_path = '/home/ymerel/fmri_pipeline_playground/spm/auditory/matlab/results/'
+
+    # COMPARE PREPROCESSING STEPS
 
     realigned_name = 'rsub-01_task-auditory_bold.nii'
 
     print_file_compare("REALIGNED",
-                       orig_results_path + 'func/' + realigned_name,
+                       orig_func_path + realigned_name,
                        work_dir + '/Preprocessing/_subject_id_01/Realign_Estimate_Reslice/' + realigned_name)
 
     mean_name = 'meansub-01_task-auditory_bold.nii'
     print_file_compare("MEAN",
-                       orig_results_path + 'func/' + mean_name,
+                       orig_func_path + mean_name,
                        work_dir + '/Preprocessing/_subject_id_01/Realign_Estimate_Reslice/' + mean_name)
 
     segmented_name = 'y_sub-01_T1w.nii'
     print_file_compare("SEGMENTED",
-                       orig_results_path + 'anat/' + segmented_name,
+                       orig_anat_path + segmented_name,
                        work_dir + '/Preprocessing/_subject_id_01/Segment/' + segmented_name)
 
     coregister_name = 'sub-01_T1w.nii'
     print_file_compare("COREGISTER ESTIMATE",
-                       orig_results_path + 'anat/' + coregister_name,
+                       orig_anat_path + coregister_name,
                        work_dir + '/Preprocessing/_subject_id_01/Coregister_Estimate/' + coregister_name)
 
     timecorrected_name = 'arsub-01_task-auditory_bold.nii'
     print_file_compare("TIME CORRECTED",
-                       orig_results_path + 'func/' + timecorrected_name,
+                       orig_func_path + timecorrected_name,
                        work_dir + '/Preprocessing/_subject_id_01/Slice_Timing/' + timecorrected_name)
 
     normalised_name = 'warsub-01_task-auditory_bold.nii'
     print_file_compare("NORMALISE WRITE",
-                       orig_results_path + 'func/' + normalised_name,
+                       orig_func_path + normalised_name,
                        work_dir + '/Preprocessing/_subject_id_01/Normalise_Write/' + normalised_name)
 
     smoothed_name = 'swarsub-01_task-auditory_bold.nii'
     print_file_compare("SMOOTHED",
-                       orig_results_path + 'func/' + smoothed_name,
+                       orig_func_path + smoothed_name,
                        work_dir + '/Preprocessing/_subject_id_01/Smooth/' + smoothed_name)
+
+    smoothed_name = 'swarsub-01_task-auditory_bold.nii'
+    print_file_compare("SMOOTHED",
+                       orig_func_path + smoothed_name,
+                       work_dir + '/Preprocessing/_subject_id_01/Smooth/' + smoothed_name)
+
+    # COMPARE 1ST LEVEL STEPS
+
+    spm_mat = 'SPM.mat'
+
+    print_file_compare("SPM.mat",
+                       orig_results_path + spm_mat,
+                       work_dir + '/Preprocessing_1st_Level_Analysis/1st_Level_Analysis/_subject_id_01/Contrast_manager/' + spm_mat)
+
+    con1_name = 'con_0001.nii'
+    con2_name = 'con_0002.nii'
+
+    print_file_compare("CONTRAST 1",
+                       orig_results_path + con1_name,
+                       work_dir + '/Preprocessing_1st_Level_Analysis/1st_Level_Analysis/_subject_id_01/Contrast_manager/' + con1_name)
+
+    print_file_compare("CONTRAST 2",
+                       orig_results_path + con2_name,
+                       work_dir + '/Preprocessing_1st_Level_Analysis/1st_Level_Analysis/_subject_id_01/Contrast_manager/' + con2_name)
+
+    map1_name = 'spmT_0001.nii'
+    map2_name = 'spmT_0002.nii'
+
+    print_file_compare("MAP 1",
+                       orig_results_path + map1_name,
+                       work_dir + '/Preprocessing_1st_Level_Analysis/1st_Level_Analysis/_subject_id_01/Contrast_manager/' + map1_name)
+
+    print_file_compare("MAP 2",
+                       orig_results_path + map2_name,
+                       work_dir + '/Preprocessing_1st_Level_Analysis/1st_Level_Analysis/_subject_id_01/Contrast_manager/' + map2_name)
 
 
 def print_file_compare(step_name, path1, path2):
