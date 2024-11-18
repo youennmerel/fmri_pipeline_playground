@@ -7,26 +7,30 @@ import nipype.interfaces.matlab as mlab  # how to run matlab
 import nipype.interfaces.spm as spm  # spm
 import nipype.pipeline.engine as pe  # pypeline engine
 from nipype import IdentityInterface, SelectFiles, DataSink
-from nipype.interfaces.spm.preprocess import RealignOutputSpec, RealignInputSpec
 
 matlab_path = '/home/ymerel/matlab/bin/matlab'
+matlab_cmd = matlab_path + " -nodesktop -nosplash"
 spm_path = '/home/ymerel/spm12/'
 
-# Set the way matlab should be called
-mlab.MatlabCommand.set_default_matlab_cmd(matlab_path + " -nodesktop -nosplash")
+
+# Matlab command line
+mlab.MatlabCommand.set_default_matlab_cmd(matlab_cmd)
+# set SPM path into matlab
 mlab.MatlabCommand.set_default_paths(os.path.abspath(spm_path))
 
 # http://www.fil.ion.ucl.ac.uk/spm/data/auditory/
 data_dir = os.path.abspath('/home/ymerel/fmri_pipeline_playground/spm/auditory/nipype/data')
 results_dir = os.path.abspath('/home/ymerel/fmri_pipeline_playground/spm/auditory/nipype/results')
 work_dir = os.path.abspath('/home/ymerel/fmri_pipeline_playground/spm/auditory/nipype/work')
+events_file = '/home/ymerel/fmri_pipeline_playground/spm/auditory/nipype/auditory_events.tsv'
 subjects = ['01']
 
 slices_nb = 64
 tr = 7.0
+units = 'scans'
+
 
 def get_infos():
-    # Infosource - a function free node to iterate over the list of subject names
     infos = pe.Node(IdentityInterface(fields=['subject_id']), name="infos")
     infos.iterables = [('subject_id', subjects)]
     return infos
@@ -34,8 +38,8 @@ def get_infos():
 
 def get_input():
     templates = {'anat': os.path.join(data_dir, 'sub-{subject_id}', 'anat', 'sub-{subject_id}_T1w.nii'),
-                 'func': os.path.join(data_dir, 'sub-{subject_id}', 'func',
-                                      'sub-{subject_id}_task-auditory_bold.nii')}
+                 'func': os.path.join(data_dir, 'sub-{subject_id}', 'func', 'sub-{subject_id}_task-auditory_bold.nii'),
+                 'events': events_file }
     return pe.Node(SelectFiles(templates, base_directory=data_dir), name="input")
 
 
@@ -47,11 +51,14 @@ def get_pipeline():
     preproc = get_preprocessing()
     analysis = get_subject_analysis()
 
-    # pipeline = pe.Workflow(name='Preprocessing_1st_Level_Analysis')
-    pipeline = preproc
+    pipeline = pe.Workflow(name='Preprocessing_1st_Level_Analysis')
     pipeline.base_dir = work_dir
-    #pipeline.connect([(preproc, analysis, [('realign.realignment_parameters',
-    #                                        'modelspec.realignment_parameters')])])
+    pipeline.connect([(preproc, analysis,
+                       [
+                        ('input.events', 'Specify_1st_level.bids_event_file'),
+                        ('Realign_Estimate_Reslice.realignment_parameters', 'Specify_1st_level.realignment_parameters'),
+                        ('Smooth.smoothed_files', 'Specify_1st_level.functional_runs')]
+                       )])
 
     return pipeline
 
@@ -62,17 +69,17 @@ def get_preprocessing():
 
     realign = pe.Node(interface=spm.Realign(), name="Realign_Estimate_Reslice")
     realign.inputs.jobtype = 'estwrite'
-    # realign.inputs.quality = 0.9
-    # realign.inputs.separation = 4
-    # realign.inputs.fwhm = 5
-    # realign.inputs.register_to_mean = True
-    # realign.inputs.interp = 2
-    # realign.inputs.wrap = [0, 0, 0]
+    realign.inputs.quality = 0.9
+    realign.inputs.separation = 4
+    realign.inputs.fwhm = 5
+    realign.inputs.register_to_mean = True
+    realign.inputs.interp = 2
+    realign.inputs.wrap = [0, 0, 0]
     # realign.inputs.weight_img = None
-    # realign.inputs.write_which = [2, 1]
-    # realign.inputs.write_interp = 4
-    # realign.inputs.write_wrap = [0, 0, 0]
-    # realign.inputs.write_mask = True
+    realign.inputs.write_which = [2, 1]
+    realign.inputs.write_interp = 4
+    realign.inputs.write_wrap = [0, 0, 0]
+    realign.inputs.write_mask = True
 
     sliceTiming = pe.Node(interface=spm.SliceTiming(), name="Slice_Timing")
     sliceTiming.inputs.num_slices = slices_nb
@@ -140,34 +147,49 @@ def get_preprocessing():
 
     return preproc
 
-def get_subject_analysis():
 
+def get_subject_analysis():
     # 1st Level Analysis
 
     analysis = pe.Workflow(name='1st_Level_Analysis')
 
+    # set matlab path into SPM
+    # See https://github.com/miykael/nipype_tutorial/issues/141
+    spm.SPMCommand.set_mlab_paths(matlab_cmd=matlab_path)
+
     modelspec = pe.Node(interface=model.SpecifySPMModel(), name="Specify_1st_level")
+    modelspec.inputs.input_units = units
+    modelspec.inputs.time_repetition = tr
+    modelspec.inputs.high_pass_filter_cutoff = 128
 
     level1design = pe.Node(interface=spm.Level1Design(), name="level1design")
+    level1design.inputs.timing_units = units
+    level1design.inputs.interscan_interval = tr
     level1design.inputs.bases = {'hrf': {'derivs': [0, 0]}}
+    level1design.inputs.model_serial_correlations = 'AR(1)'
+    level1design.inputs.mask_threshold = 0.8
+    level1design.inputs.volterra_expansion_order = 1
 
     estimate = pe.Node(interface=spm.EstimateModel(), name="Model_Estimation")
     estimate.inputs.estimation_method = {'Classical': 1}
-
-    threshold = pe.Node(interface=spm.Threshold(), name="threshold")
+    estimate.inputs.write_residuals = True
 
     contrast = pe.Node(interface=spm.EstimateContrast(), name="Contrast_manager")
+    contrast.inputs.contrasts = [
+        ('listening > rest', 'T', ['listening'], [1]),
+        ('rest > listening', 'T', ['listening'], [-1])
+    ]
 
-    analysis.connect([(modelspec, level1design, [('session_info', 'session_info')]),
-                      (level1design, estimate, [('spm_mat_file', 'spm_mat_file')]),
-                      (estimate, contrast, [('spm_mat_file', 'spm_mat_file'),
-                                            ('beta_images', 'beta_images'),
-                                            ('residual_image', 'residual_image')]),
-                      (contrast, threshold, [('spm_mat_file', 'spm_mat_file'),
-                                             ('spmT_images', 'stat_image')]),
-                      ])
+
+    analysis.connect([
+        (modelspec, level1design, [('session_info', 'session_info')]),
+        (level1design, estimate, [('spm_mat_file', 'spm_mat_file')]),
+        (estimate, contrast,
+         [('spm_mat_file', 'spm_mat_file'), ('beta_images', 'beta_images'), ('residual_image', 'residual_image')]),
+    ])
 
     return analysis
+
 
 def compare_outputs():
     orig_results_path = '/home/ymerel/fmri_pipeline_playground/spm/auditory/matlab/data/sub-01/'
