@@ -55,7 +55,7 @@ for i = 1:numel(subjects)
 
     matlabbatch{2}.spm.temporal.st.scans{1}(1) = cfg_dep('Realign: Estimate & Reslice: Resliced Images (Sess 1)', substruct('.','val', '{}',{1}, '.','val', '{}',{1}, '.','val', '{}',{1}, '.','val', '{}',{1}), substruct('.','sess', '()',{1}, '.','rfiles'));
     matlabbatch{2}.spm.temporal.st.nslices = 64;
-    matlabbatch{2}.spm.temporal.st.tr = 7;
+    matlabbatch{2}.spm.temporal.st.tr = tr;
     matlabbatch{2}.spm.temporal.st.ta = 6.8906;
     matlabbatch{2}.spm.temporal.st.so = [64 63 62 61 60 59 58 57 56 55 54 53 52 51 50 49 48 47 46 45 44 43 42 41 40 39 38 37 36 35 34 33 32 31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1];
     matlabbatch{2}.spm.temporal.st.refslice = 32;

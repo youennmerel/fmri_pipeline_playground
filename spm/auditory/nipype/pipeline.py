@@ -83,18 +83,16 @@ def get_preprocessing():
 
     sliceTiming = pe.Node(interface=spm.SliceTiming(), name="Slice_Timing")
     sliceTiming.inputs.num_slices = slices_nb
-    sliceTiming.inputs.time_repetition = tr
-    sliceTiming.inputs.time_acquisition = tr - (tr / slices_nb)
+    sliceTiming.inputs.time_repetition = 7
+    # sliceTiming.inputs.time_acquisition = tr - (tr / slices_nb)
+    sliceTiming.inputs.time_acquisition = 6.8906
     sliceTiming.inputs.slice_order = list(range(slices_nb, 0, -1))  # [64 63 62 ... 3 2 1]
-    sliceTiming.inputs.ref_slice = slices_nb / 2
+    # sliceTiming.inputs.ref_slice = slices_nb / 2
+    sliceTiming.inputs.ref_slice = 32
 
     coregister = pe.Node(interface=spm.Coregister(), name="Coregister_Estimate")
     coregister.inputs.jobtype = 'estimate'
-    # coregister.inputs.apply_to_files = None
-    # coregister.inputs.cost_function = 'nmi'
-    # coregister.inputs.separation = [4.0, 2.0]
-    # coregister.inputs.tolerance = [0.02, 0.02, 0.02, 0.001, 0.001, 0.001, 0.01, 0.01, 0.01, 0.001, 0.001, 0.001]
-    # coregister.inputs.fwhm = [7.0, 7.0]
+
 
     segment = pe.Node(interface=spm.NewSegment(), name="Segment")
     # channel.biasreg, channel.biasfwhm, channel.write (Field, Corrected)
