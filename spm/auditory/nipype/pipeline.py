@@ -8,6 +8,8 @@ import nipype.interfaces.spm as spm  # spm
 import nipype.pipeline.engine as pe  # pypeline engine
 from nipype import IdentityInterface, SelectFiles, DataSink
 
+from common.utils import print_correlation
+
 matlab_path = '/home/ymerel/matlab/bin/matlab'
 matlab_cmd = matlab_path + " -nodesktop -nosplash"
 spm_path = '/home/ymerel/spm12/'
@@ -157,6 +159,7 @@ def get_subject_analysis():
 
     modelspec = pe.Node(interface=model.SpecifySPMModel(), name="Specify_1st_level")
     modelspec.inputs.input_units = units
+    modelspec.inputs.output_units = units
     modelspec.inputs.time_repetition = tr
     modelspec.inputs.high_pass_filter_cutoff = 128
 
@@ -167,6 +170,10 @@ def get_subject_analysis():
     level1design.inputs.model_serial_correlations = 'AR(1)'
     level1design.inputs.mask_threshold = 0.8
     level1design.inputs.volterra_expansion_order = 1
+    # level1design.inputs.microtime_onset = 8
+    # level1design.inputs.microtime_resolution = 16
+    # level1design.inputs.global_intensity_normalization = 'none'
+    # level1design.inputs.flags = {'mthresh': 0.8}
 
     estimate = pe.Node(interface=spm.EstimateModel(), name="Model_Estimation")
     estimate.inputs.estimation_method = {'Classical': 1}
@@ -177,7 +184,6 @@ def get_subject_analysis():
         ('listening > rest', 'T', ['listening'], [1]),
         ('rest > listening', 'T', ['listening'], [-1])
     ]
-
 
     analysis.connect([
         (modelspec, level1design, [('session_info', 'session_info')]),
@@ -198,94 +204,63 @@ def compare_outputs():
 
     realigned_name = 'rsub-01_task-auditory_bold.nii'
 
-    print_file_compare("REALIGNED",
+    print_correlation("REALIGNED",
                        orig_func_path + realigned_name,
                        work_dir + '/Preprocessing/_subject_id_01/Realign_Estimate_Reslice/' + realigned_name)
 
     mean_name = 'meansub-01_task-auditory_bold.nii'
-    print_file_compare("MEAN",
+    print_correlation("MEAN",
                        orig_func_path + mean_name,
                        work_dir + '/Preprocessing/_subject_id_01/Realign_Estimate_Reslice/' + mean_name)
 
     segmented_name = 'y_sub-01_T1w.nii'
-    print_file_compare("SEGMENTED",
+    print_correlation("SEGMENTED",
                        orig_anat_path + segmented_name,
                        work_dir + '/Preprocessing/_subject_id_01/Segment/' + segmented_name)
 
     coregister_name = 'sub-01_T1w.nii'
-    print_file_compare("COREGISTER ESTIMATE",
+    print_correlation("COREGISTER ESTIMATE",
                        orig_anat_path + coregister_name,
                        work_dir + '/Preprocessing/_subject_id_01/Coregister_Estimate/' + coregister_name)
 
     timecorrected_name = 'arsub-01_task-auditory_bold.nii'
-    print_file_compare("TIME CORRECTED",
+    print_correlation("TIME CORRECTED",
                        orig_func_path + timecorrected_name,
                        work_dir + '/Preprocessing/_subject_id_01/Slice_Timing/' + timecorrected_name)
 
     normalised_name = 'warsub-01_task-auditory_bold.nii'
-    print_file_compare("NORMALISE WRITE",
+    print_correlation("NORMALISE WRITE",
                        orig_func_path + normalised_name,
                        work_dir + '/Preprocessing/_subject_id_01/Normalise_Write/' + normalised_name)
 
     smoothed_name = 'swarsub-01_task-auditory_bold.nii'
-    print_file_compare("SMOOTHED",
-                       orig_func_path + smoothed_name,
-                       work_dir + '/Preprocessing/_subject_id_01/Smooth/' + smoothed_name)
-
-    smoothed_name = 'swarsub-01_task-auditory_bold.nii'
-    print_file_compare("SMOOTHED",
+    print_correlation("SMOOTHED",
                        orig_func_path + smoothed_name,
                        work_dir + '/Preprocessing/_subject_id_01/Smooth/' + smoothed_name)
 
     # COMPARE 1ST LEVEL STEPS
 
-    spm_mat = 'SPM.mat'
-
-    print_file_compare("SPM.mat",
-                       orig_results_path + spm_mat,
-                       work_dir + '/Preprocessing_1st_Level_Analysis/1st_Level_Analysis/_subject_id_01/Contrast_manager/' + spm_mat)
-
     con1_name = 'con_0001.nii'
     con2_name = 'con_0002.nii'
 
-    print_file_compare("CONTRAST 1",
+    print_correlation("CONTRAST 1",
                        orig_results_path + con1_name,
                        work_dir + '/Preprocessing_1st_Level_Analysis/1st_Level_Analysis/_subject_id_01/Contrast_manager/' + con1_name)
 
-    print_file_compare("CONTRAST 2",
+    print_correlation("CONTRAST 2",
                        orig_results_path + con2_name,
                        work_dir + '/Preprocessing_1st_Level_Analysis/1st_Level_Analysis/_subject_id_01/Contrast_manager/' + con2_name)
 
     map1_name = 'spmT_0001.nii'
     map2_name = 'spmT_0002.nii'
 
-    print_file_compare("MAP 1",
+    print_correlation("MAP 1",
                        orig_results_path + map1_name,
                        work_dir + '/Preprocessing_1st_Level_Analysis/1st_Level_Analysis/_subject_id_01/Contrast_manager/' + map1_name)
 
-    print_file_compare("MAP 2",
+    print_correlation("MAP 2",
                        orig_results_path + map2_name,
                        work_dir + '/Preprocessing_1st_Level_Analysis/1st_Level_Analysis/_subject_id_01/Contrast_manager/' + map2_name)
-
-
-def print_file_compare(step_name, path1, path2):
-    path1_sum = get_file_md5(path1)
-    path_2_sum = get_file_md5(path2)
-
-    operator = " == "
-    if path1_sum != path_2_sum:
-        operator = " <> "
-
-    print("Compare [" + step_name + "] : "
-          + path1_sum
-          + operator
-          + path_2_sum)
-
-
-def get_file_md5(path: str):
-    with open(path, 'rb') as file:
-        content = file.read()
-        return hashlib.md5(content).hexdigest()
 
 
 if __name__ == '__main__':

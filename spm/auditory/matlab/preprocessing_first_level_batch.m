@@ -6,11 +6,14 @@
 
 clear all % clear all variables
 clc % clear command window
+addpath /home/ymerel/spm12/
 
 data = '/home/ymerel/fmri_pipeline_playground/spm/auditory/matlab/data/' % path to BIDS data
 results = '/home/ymerel/fmri_pipeline_playground/spm/auditory/matlab/results' % path to 1st level analysis results
 
 subjects = {'sub-01'} % subject to process
+
+tr = 7
 
 for i = 1:numel(subjects)
 
@@ -181,17 +184,17 @@ for i = 1:numel(subjects)
 
     %%% Result report %%%
 
-    spm('defaults','FMRI');
-    matlabbatch{10}.spm.stats.results.spmmat(1) = cfg_dep('Contrast Manager: SPM.mat File', substruct('.','val', '{}',{9}, '.','val', '{}',{1}, '.','val', '{}',{1}), substruct('.','spmmat'));
-    matlabbatch{10}.spm.stats.results.conspec.titlestr = '';
-    matlabbatch{10}.spm.stats.results.conspec.contrasts = Inf;
-    matlabbatch{10}.spm.stats.results.conspec.threshdesc = 'FWE';
-    matlabbatch{10}.spm.stats.results.conspec.thresh = 0.05;
-    matlabbatch{10}.spm.stats.results.conspec.extent = 0;
-    matlabbatch{10}.spm.stats.results.conspec.conjunction = 1;
-    matlabbatch{10}.spm.stats.results.conspec.mask.none = 1;
-    matlabbatch{10}.spm.stats.results.units = 1;
-    matlabbatch{10}.spm.stats.results.export{1}.ps = true;
+    % spm('defaults','FMRI');
+    % matlabbatch{10}.spm.stats.results.spmmat(1) = cfg_dep('Contrast Manager: SPM.mat File', substruct('.','val', '{}',{9}, '.','val', '{}',{1}, '.','val', '{}',{1}), substruct('.','spmmat'));
+    % matlabbatch{10}.spm.stats.results.conspec.titlestr = '';
+    % matlabbatch{10}.spm.stats.results.conspec.contrasts = Inf;
+    % matlabbatch{10}.spm.stats.results.conspec.threshdesc = 'FWE';
+    % matlabbatch{10}.spm.stats.results.conspec.thresh = 0.05;
+    % matlabbatch{10}.spm.stats.results.conspec.extent = 0;
+    % matlabbatch{10}.spm.stats.results.conspec.conjunction = 1;
+    % matlabbatch{10}.spm.stats.results.conspec.mask.none = 1;
+    % matlabbatch{10}.spm.stats.results.units = 1;
+    % matlabbatch{10}.spm.stats.results.export{1}.ps = true;
 
     save preprocessing_batch matlabbatch % save the setup into a matfile called preprocessing_batch.mat
 
